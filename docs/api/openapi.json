@@ -1,0 +1,1658 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "CargoBox API — Lógica de Negocios",
+    "description": "Sistema de gestión logística y paquetería express nacional.\n\nImplementa DDD, Specification Pattern, State Machine y Domain Events.\n\n**Equipo 14** — Componentes de Lógica de Negocios (CLN) AD2026",
+    "version": "1.1.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "Salud y Monitoreo"
+        ],
+        "summary": "Estado del Servicio",
+        "description": "Verifica que la API responde y que la base de datos acepta consultas.",
+        "operationId": "healthcheck_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/operaciones/": {
+      "post": {
+        "tags": [
+          "Operaciones"
+        ],
+        "summary": "Crear Operacion",
+        "description": "Registra una nueva operación comercial.",
+        "operationId": "crear_operacion_operaciones__post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperacionCreateDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperacionResponseDTO"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/operaciones/{operacion_id}": {
+      "get": {
+        "tags": [
+          "Operaciones"
+        ],
+        "summary": "Obtener Operacion",
+        "description": "Consulta una operación por su ID.",
+        "operationId": "obtener_operacion_operaciones__operacion_id__get",
+        "parameters": [
+          {
+            "name": "operacion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Operacion Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperacionResponseDTO"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/operaciones/{operacion_id}/transicion": {
+      "post": {
+        "tags": [
+          "Operaciones"
+        ],
+        "summary": "Ejecutar Transicion",
+        "description": "Ejecuta una transición de estado sobre la operación.",
+        "operationId": "ejecutar_transicion_operaciones__operacion_id__transicion_post",
+        "parameters": [
+          {
+            "name": "operacion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Operacion Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransicionRequestDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransicionResponseDTO"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/operaciones/{operacion_id}/validar": {
+      "get": {
+        "tags": [
+          "Operaciones"
+        ],
+        "summary": "Validar Precondiciones",
+        "description": "Evalúa la regla puede_procesarse sobre la operación.",
+        "operationId": "validar_precondiciones_operaciones__operacion_id__validar_get",
+        "parameters": [
+          {
+            "name": "operacion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Operacion Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvaluacionReglaResponseDTO"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/operaciones/{operacion_id}/beneficio": {
+      "get": {
+        "tags": [
+          "Operaciones"
+        ],
+        "summary": "Evaluar Beneficio",
+        "description": "Evalúa la regla beneficio_referencia sobre la operación.",
+        "operationId": "evaluar_beneficio_operaciones__operacion_id__beneficio_get",
+        "parameters": [
+          {
+            "name": "operacion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Operacion Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvaluacionReglaResponseDTO"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/envios/": {
+      "post": {
+        "tags": [
+          "Envíos y Logística"
+        ],
+        "summary": "Registrar Envio",
+        "description": "Registra un nuevo envío de paquetería en sucursal.",
+        "operationId": "registrar_envio_envios__post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnvioCreateDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnvioResponseDTO"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/envios/alertas/rastreo-detenido": {
+      "get": {
+        "tags": [
+          "Envíos y Logística"
+        ],
+        "summary": "Alertas Rastreo Detenido",
+        "description": "US6: envíos EN_TRANSITO con más de 24 h sin movimiento (notifica a Atención a Clientes).",
+        "operationId": "alertas_rastreo_detenido_envios_alertas_rastreo_detenido_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AlertaRastreoDTO"
+                  },
+                  "type": "array",
+                  "title": "Response Alertas Rastreo Detenido Envios Alertas Rastreo Detenido Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/envios/{guia}": {
+      "get": {
+        "tags": [
+          "Envíos y Logística"
+        ],
+        "summary": "Consultar Envio",
+        "description": "Consulta estado y detalle de un envío por su guía de rastreo.",
+        "operationId": "consultar_envio_envios__guia__get",
+        "parameters": [
+          {
+            "name": "guia",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Guia"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnvioResponseDTO"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/envios/{guia}/cancelar": {
+      "post": {
+        "tags": [
+          "Envíos y Logística"
+        ],
+        "summary": "Cancelar Envio",
+        "description": "Cancela un envío (solo permitido en estado RECIBIDO).",
+        "operationId": "cancelar_envio_envios__guia__cancelar_post",
+        "parameters": [
+          {
+            "name": "guia",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Guia"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelarEnvioDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnvioResponseDTO"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/envios/{guia}/direccion": {
+      "post": {
+        "tags": [
+          "Envíos y Logística"
+        ],
+        "summary": "Actualizar Direccion",
+        "description": "Actualiza la dirección de destino del envío.",
+        "operationId": "actualizar_direccion_envios__guia__direccion_post",
+        "parameters": [
+          {
+            "name": "guia",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Guia"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActualizarDireccionDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnvioResponseDTO"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/envios/{guia}/intento-fallido": {
+      "post": {
+        "tags": [
+          "Envíos y Logística"
+        ],
+        "summary": "Registrar Intento Fallido",
+        "description": "Registra un intento fallido de entrega domiciliaria.",
+        "operationId": "registrar_intento_fallido_envios__guia__intento_fallido_post",
+        "parameters": [
+          {
+            "name": "guia",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Guia"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IntentoFallidoDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnvioResponseDTO"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/envios/{guia}/indemnizacion": {
+      "post": {
+        "tags": [
+          "Envíos y Logística"
+        ],
+        "summary": "Dictaminar Indemnizacion",
+        "description": "Dictamina indemnización por daño, extravío o reclamación de seguro.",
+        "operationId": "dictaminar_indemnizacion_envios__guia__indemnizacion_post",
+        "parameters": [
+          {
+            "name": "guia",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Guia"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DictamenIndemnizacionDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DictamenIndemnizacionResponseDTO"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/envios/{guia}/rastreo": {
+      "get": {
+        "tags": [
+          "Envíos y Logística"
+        ],
+        "summary": "Consultar Rastreo",
+        "description": "US5: estado actual, historial de movimientos y fecha estimada de entrega.",
+        "operationId": "consultar_rastreo_envios__guia__rastreo_get",
+        "parameters": [
+          {
+            "name": "guia",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Guia"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RastreoResponseDTO"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/envios/{guia}/avanzar": {
+      "post": {
+        "tags": [
+          "Envíos y Logística"
+        ],
+        "summary": "Avanzar Envio",
+        "description": "Avanza el envío al siguiente estado de la ruta (sin saltos): RECIBIDO -> CLASIFICADO -> EN_TRANSITO -> DISTRIBUCION_LOCAL -> EN_REPARTO.",
+        "operationId": "avanzar_envio_envios__guia__avanzar_post",
+        "parameters": [
+          {
+            "name": "guia",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Guia"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AvanzarEnvioDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnvioResponseDTO"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/envios/{guia}/entregar": {
+      "post": {
+        "tags": [
+          "Envíos y Logística"
+        ],
+        "summary": "Entregar Envio",
+        "description": "US13: entrega final con nombre del receptor y evidencia (solo si está EN_REPARTO).",
+        "operationId": "entregar_envio_envios__guia__entregar_post",
+        "parameters": [
+          {
+            "name": "guia",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Guia"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntregaDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnvioResponseDTO"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/envios/{guia}/incidencias": {
+      "post": {
+        "tags": [
+          "Envíos y Logística"
+        ],
+        "summary": "Reportar Incidencia",
+        "description": "US9/US11: dirección incorrecta (regresa a DISTRIBUCION_LOCAL) o paquete dañado (requiere evidencia).",
+        "operationId": "reportar_incidencia_envios__guia__incidencias_post",
+        "parameters": [
+          {
+            "name": "guia",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Guia"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IncidenciaDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IncidenciaResponseDTO"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reportes/entregas-a-tiempo": {
+      "get": {
+        "tags": [
+          "Reportes Analíticos"
+        ],
+        "summary": "Reporte Entregas A Tiempo",
+        "description": "US14: porcentaje de envíos entregados dentro de la promesa de servicio (72 h).",
+        "operationId": "reporte_entregas_a_tiempo_reportes_entregas_a_tiempo_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReporteEntregasATiempoDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reportes/incidencias": {
+      "get": {
+        "tags": [
+          "Reportes Analíticos"
+        ],
+        "summary": "Reporte Incidencias",
+        "description": "US15: conteo de incidencias agrupadas por tipo.",
+        "operationId": "reporte_incidencias_reportes_incidencias_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReporteIncidenciasDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ActualizarDireccionDTO": {
+        "properties": {
+          "nueva_direccion": {
+            "$ref": "#/components/schemas/DireccionDTO"
+          },
+          "rol_solicitante": {
+            "type": "string",
+            "title": "Rol Solicitante",
+            "default": "ATENCION_CLIENTES"
+          }
+        },
+        "type": "object",
+        "required": [
+          "nueva_direccion"
+        ],
+        "title": "ActualizarDireccionDTO"
+      },
+      "AlertaRastreoDTO": {
+        "properties": {
+          "guia": {
+            "type": "string",
+            "title": "Guia"
+          },
+          "estado": {
+            "type": "string",
+            "title": "Estado"
+          },
+          "horas_sin_movimiento": {
+            "type": "number",
+            "title": "Horas Sin Movimiento"
+          },
+          "notificado_a": {
+            "type": "string",
+            "title": "Notificado A",
+            "default": "ATENCION_CLIENTES"
+          }
+        },
+        "type": "object",
+        "required": [
+          "guia",
+          "estado",
+          "horas_sin_movimiento"
+        ],
+        "title": "AlertaRastreoDTO"
+      },
+      "AvanzarEnvioDTO": {
+        "properties": {
+          "destino": {
+            "type": "string",
+            "title": "Destino",
+            "description": "Siguiente estado: CLASIFICADO, EN_TRANSITO, DISTRIBUCION_LOCAL o EN_REPARTO."
+          },
+          "cedis_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cedis Id",
+            "description": "CEDIS donde ocurre el movimiento (opcional)."
+          }
+        },
+        "type": "object",
+        "required": [
+          "destino"
+        ],
+        "title": "AvanzarEnvioDTO"
+      },
+      "CancelarEnvioDTO": {
+        "properties": {
+          "motivo": {
+            "type": "string",
+            "title": "Motivo",
+            "default": "Solicitud de cancelación por remitente en sucursal"
+          }
+        },
+        "type": "object",
+        "title": "CancelarEnvioDTO"
+      },
+      "DetalleOperacionDTO": {
+        "properties": {
+          "recurso_id": {
+            "type": "string",
+            "title": "Recurso Id"
+          },
+          "cantidad": {
+            "type": "integer",
+            "title": "Cantidad"
+          },
+          "precio_unitario": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Precio Unitario",
+            "default": "0.00"
+          },
+          "subtotal": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Subtotal",
+            "default": "0.00"
+          }
+        },
+        "type": "object",
+        "required": [
+          "recurso_id",
+          "cantidad"
+        ],
+        "title": "DetalleOperacionDTO"
+      },
+      "DictamenIndemnizacionDTO": {
+        "properties": {
+          "monto_reclamado": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Monto Reclamado"
+          },
+          "rol_dictaminador": {
+            "type": "string",
+            "title": "Rol Dictaminador",
+            "default": "ANALISTA_CALIDAD"
+          }
+        },
+        "type": "object",
+        "required": [
+          "monto_reclamado"
+        ],
+        "title": "DictamenIndemnizacionDTO"
+      },
+      "DictamenIndemnizacionResponseDTO": {
+        "properties": {
+          "guia": {
+            "type": "string",
+            "title": "Guia"
+          },
+          "monto_reclamado": {
+            "type": "string",
+            "title": "Monto Reclamado"
+          },
+          "monto_autorizado": {
+            "type": "string",
+            "title": "Monto Autorizado"
+          },
+          "tiene_seguro": {
+            "type": "boolean",
+            "title": "Tiene Seguro"
+          },
+          "dictaminado_por": {
+            "type": "string",
+            "title": "Dictaminado Por"
+          },
+          "mensaje": {
+            "type": "string",
+            "title": "Mensaje"
+          }
+        },
+        "type": "object",
+        "required": [
+          "guia",
+          "monto_reclamado",
+          "monto_autorizado",
+          "tiene_seguro",
+          "dictaminado_por",
+          "mensaje"
+        ],
+        "title": "DictamenIndemnizacionResponseDTO"
+      },
+      "DireccionDTO": {
+        "properties": {
+          "calle": {
+            "type": "string",
+            "title": "Calle"
+          },
+          "numero": {
+            "type": "string",
+            "title": "Numero"
+          },
+          "colonia": {
+            "type": "string",
+            "title": "Colonia",
+            "default": ""
+          },
+          "ciudad": {
+            "type": "string",
+            "title": "Ciudad"
+          },
+          "codigo_postal": {
+            "type": "string",
+            "title": "Codigo Postal"
+          },
+          "referencias": {
+            "type": "string",
+            "title": "Referencias",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "required": [
+          "calle",
+          "numero",
+          "ciudad",
+          "codigo_postal"
+        ],
+        "title": "DireccionDTO"
+      },
+      "EntregaDTO": {
+        "properties": {
+          "receptor": {
+            "type": "string",
+            "title": "Receptor",
+            "description": "Nombre de quien recibe el paquete."
+          },
+          "evidencia_id": {
+            "type": "string",
+            "title": "Evidencia Id",
+            "description": "Identificador de la firma o foto de entrega."
+          }
+        },
+        "type": "object",
+        "required": [
+          "receptor",
+          "evidencia_id"
+        ],
+        "title": "EntregaDTO"
+      },
+      "EnvioCreateDTO": {
+        "properties": {
+          "guia": {
+            "type": "string",
+            "title": "Guia"
+          },
+          "remitente_id": {
+            "type": "string",
+            "title": "Remitente Id"
+          },
+          "destinatario_nombre": {
+            "type": "string",
+            "title": "Destinatario Nombre"
+          },
+          "direccion_origen": {
+            "$ref": "#/components/schemas/DireccionDTO"
+          },
+          "direccion_destino": {
+            "$ref": "#/components/schemas/DireccionDTO"
+          },
+          "peso_kg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Peso Kg"
+          },
+          "largo_cm": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Largo Cm",
+            "default": "30.0"
+          },
+          "ancho_cm": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Ancho Cm",
+            "default": "20.0"
+          },
+          "alto_cm": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Alto Cm",
+            "default": "15.0"
+          },
+          "descripcion_paquete": {
+            "type": "string",
+            "title": "Descripcion Paquete",
+            "default": "Paquete general"
+          },
+          "seguro_amparado": {
+            "type": "boolean",
+            "title": "Seguro Amparado",
+            "default": false
+          },
+          "valor_declarado": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Valor Declarado",
+            "default": "0.00"
+          },
+          "flete_monto": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Flete Monto",
+            "default": "350.00"
+          }
+        },
+        "type": "object",
+        "required": [
+          "guia",
+          "remitente_id",
+          "destinatario_nombre",
+          "direccion_origen",
+          "direccion_destino",
+          "peso_kg"
+        ],
+        "title": "EnvioCreateDTO"
+      },
+      "EnvioResponseDTO": {
+        "properties": {
+          "guia": {
+            "type": "string",
+            "title": "Guia"
+          },
+          "remitente_id": {
+            "type": "string",
+            "title": "Remitente Id"
+          },
+          "destinatario_nombre": {
+            "type": "string",
+            "title": "Destinatario Nombre"
+          },
+          "estado": {
+            "type": "string",
+            "title": "Estado"
+          },
+          "intentos_entrega": {
+            "type": "integer",
+            "title": "Intentos Entrega"
+          },
+          "cedis_actual": {
+            "type": "string",
+            "title": "Cedis Actual"
+          },
+          "flete_mxn": {
+            "type": "string",
+            "title": "Flete Mxn"
+          },
+          "seguro_amparado": {
+            "type": "boolean",
+            "title": "Seguro Amparado"
+          },
+          "valor_declarado_mxn": {
+            "type": "string",
+            "title": "Valor Declarado Mxn"
+          },
+          "origen_resumen": {
+            "type": "string",
+            "title": "Origen Resumen"
+          },
+          "destino_resumen": {
+            "type": "string",
+            "title": "Destino Resumen"
+          }
+        },
+        "type": "object",
+        "required": [
+          "guia",
+          "remitente_id",
+          "destinatario_nombre",
+          "estado",
+          "intentos_entrega",
+          "cedis_actual",
+          "flete_mxn",
+          "seguro_amparado",
+          "valor_declarado_mxn",
+          "origen_resumen",
+          "destino_resumen"
+        ],
+        "title": "EnvioResponseDTO"
+      },
+      "EvaluacionReglaResponseDTO": {
+        "properties": {
+          "operacion_id": {
+            "type": "string",
+            "title": "Operacion Id"
+          },
+          "regla": {
+            "type": "string",
+            "title": "Regla"
+          },
+          "cumple": {
+            "type": "boolean",
+            "title": "Cumple"
+          },
+          "explicacion": {
+            "type": "string",
+            "title": "Explicacion"
+          }
+        },
+        "type": "object",
+        "required": [
+          "operacion_id",
+          "regla",
+          "cumple",
+          "explicacion"
+        ],
+        "title": "EvaluacionReglaResponseDTO"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "IncidenciaDTO": {
+        "properties": {
+          "tipo": {
+            "type": "string",
+            "title": "Tipo",
+            "description": "DIRECCION_INCORRECTA, PAQUETE_DANADO, EXTRAVIO o RECHAZO."
+          },
+          "descripcion": {
+            "type": "string",
+            "title": "Descripcion"
+          },
+          "evidencia_id": {
+            "type": "string",
+            "title": "Evidencia Id",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "required": [
+          "tipo",
+          "descripcion"
+        ],
+        "title": "IncidenciaDTO"
+      },
+      "IncidenciaResponseDTO": {
+        "properties": {
+          "incidencia_id": {
+            "type": "string",
+            "title": "Incidencia Id"
+          },
+          "guia": {
+            "type": "string",
+            "title": "Guia"
+          },
+          "tipo": {
+            "type": "string",
+            "title": "Tipo"
+          },
+          "descripcion": {
+            "type": "string",
+            "title": "Descripcion"
+          },
+          "evidencia_id": {
+            "type": "string",
+            "title": "Evidencia Id"
+          },
+          "estado_envio": {
+            "type": "string",
+            "title": "Estado Envio"
+          }
+        },
+        "type": "object",
+        "required": [
+          "incidencia_id",
+          "guia",
+          "tipo",
+          "descripcion",
+          "evidencia_id",
+          "estado_envio"
+        ],
+        "title": "IncidenciaResponseDTO"
+      },
+      "IntentoFallidoDTO": {
+        "properties": {
+          "motivo": {
+            "type": "string",
+            "title": "Motivo",
+            "default": "Destinatario no responde en domicilio"
+          }
+        },
+        "type": "object",
+        "title": "IntentoFallidoDTO"
+      },
+      "MovimientoDTO": {
+        "properties": {
+          "estado": {
+            "type": "string",
+            "title": "Estado"
+          },
+          "detalle": {
+            "type": "string",
+            "title": "Detalle"
+          },
+          "fecha": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Fecha"
+          }
+        },
+        "type": "object",
+        "required": [
+          "estado",
+          "detalle",
+          "fecha"
+        ],
+        "title": "MovimientoDTO"
+      },
+      "OperacionCreateDTO": {
+        "properties": {
+          "operacion_id": {
+            "type": "string",
+            "title": "Operacion Id"
+          },
+          "actor_id": {
+            "type": "string",
+            "title": "Actor Id"
+          },
+          "promocion_activa": {
+            "type": "boolean",
+            "title": "Promocion Activa",
+            "default": false
+          },
+          "autorizado": {
+            "type": "boolean",
+            "title": "Autorizado",
+            "default": true
+          },
+          "referencia": {
+            "type": "string",
+            "title": "Referencia",
+            "default": ""
+          },
+          "detalles": {
+            "items": {
+              "$ref": "#/components/schemas/DetalleOperacionDTO"
+            },
+            "type": "array",
+            "title": "Detalles",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "operacion_id",
+          "actor_id"
+        ],
+        "title": "OperacionCreateDTO"
+      },
+      "OperacionResponseDTO": {
+        "properties": {
+          "operacion_id": {
+            "type": "string",
+            "title": "Operacion Id"
+          },
+          "actor_id": {
+            "type": "string",
+            "title": "Actor Id"
+          },
+          "estado": {
+            "type": "string",
+            "title": "Estado"
+          },
+          "fecha_solicitud": {
+            "type": "string",
+            "title": "Fecha Solicitud"
+          },
+          "promocion_activa": {
+            "type": "boolean",
+            "title": "Promocion Activa"
+          },
+          "autorizado": {
+            "type": "boolean",
+            "title": "Autorizado"
+          },
+          "referencia": {
+            "type": "string",
+            "title": "Referencia"
+          },
+          "total_mxn": {
+            "type": "string",
+            "title": "Total Mxn"
+          },
+          "detalles_count": {
+            "type": "integer",
+            "title": "Detalles Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "operacion_id",
+          "actor_id",
+          "estado",
+          "fecha_solicitud",
+          "promocion_activa",
+          "autorizado",
+          "referencia",
+          "total_mxn",
+          "detalles_count"
+        ],
+        "title": "OperacionResponseDTO"
+      },
+      "RastreoResponseDTO": {
+        "properties": {
+          "guia": {
+            "type": "string",
+            "title": "Guia"
+          },
+          "estado_actual": {
+            "type": "string",
+            "title": "Estado Actual"
+          },
+          "cedis_actual": {
+            "type": "string",
+            "title": "Cedis Actual"
+          },
+          "intentos_entrega": {
+            "type": "integer",
+            "title": "Intentos Entrega"
+          },
+          "fecha_estimada_entrega": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Fecha Estimada Entrega"
+          },
+          "historial": {
+            "items": {
+              "$ref": "#/components/schemas/MovimientoDTO"
+            },
+            "type": "array",
+            "title": "Historial"
+          }
+        },
+        "type": "object",
+        "required": [
+          "guia",
+          "estado_actual",
+          "cedis_actual",
+          "intentos_entrega",
+          "fecha_estimada_entrega",
+          "historial"
+        ],
+        "title": "RastreoResponseDTO"
+      },
+      "ReporteEntregasATiempoDTO": {
+        "properties": {
+          "total_entregados": {
+            "type": "integer",
+            "title": "Total Entregados"
+          },
+          "entregados_a_tiempo": {
+            "type": "integer",
+            "title": "Entregados A Tiempo"
+          },
+          "porcentaje_a_tiempo": {
+            "type": "number",
+            "title": "Porcentaje A Tiempo"
+          },
+          "sla_horas": {
+            "type": "integer",
+            "title": "Sla Horas"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_entregados",
+          "entregados_a_tiempo",
+          "porcentaje_a_tiempo",
+          "sla_horas"
+        ],
+        "title": "ReporteEntregasATiempoDTO"
+      },
+      "ReporteIncidenciasDTO": {
+        "properties": {
+          "total_incidencias": {
+            "type": "integer",
+            "title": "Total Incidencias"
+          },
+          "por_tipo": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Por Tipo"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_incidencias",
+          "por_tipo"
+        ],
+        "title": "ReporteIncidenciasDTO"
+      },
+      "TransicionRequestDTO": {
+        "properties": {
+          "accion": {
+            "type": "string",
+            "title": "Accion",
+            "description": "Acción de la máquina de estados: aprobar, completar, cancelar, despachar, etc."
+          }
+        },
+        "type": "object",
+        "required": [
+          "accion"
+        ],
+        "title": "TransicionRequestDTO"
+      },
+      "TransicionResponseDTO": {
+        "properties": {
+          "operacion_id": {
+            "type": "string",
+            "title": "Operacion Id"
+          },
+          "accion_ejecutada": {
+            "type": "string",
+            "title": "Accion Ejecutada"
+          },
+          "estado_anterior": {
+            "type": "string",
+            "title": "Estado Anterior"
+          },
+          "estado_nuevo": {
+            "type": "string",
+            "title": "Estado Nuevo"
+          },
+          "mensaje": {
+            "type": "string",
+            "title": "Mensaje"
+          }
+        },
+        "type": "object",
+        "required": [
+          "operacion_id",
+          "accion_ejecutada",
+          "estado_anterior",
+          "estado_nuevo",
+          "mensaje"
+        ],
+        "title": "TransicionResponseDTO"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

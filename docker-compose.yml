@@ -1,0 +1,48 @@
+# CargoBox — DB (PostgreSQL) + App (FastAPI) + Tests (pytest).
+# Uso:  cp .env.example .env   y luego   docker compose up --build
+# Cada variable tiene un valor por defecto, así que también funciona sin .env.
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: cargobox_db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-cargobox}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cargobox}
+      POSTGRES_DB: ${POSTGRES_DB:-cargobox}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-cargobox} -d ${POSTGRES_DB:-cargobox}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    container_name: cargobox_app
+    environment:
+      PORT: 8000
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-cargobox}:${POSTGRES_PASSWORD:-cargobox}@db:5432/${POSTGRES_DB:-cargobox}
+    ports:
+      - "${APP_PORT:-8080}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Pruebas unitarias + integración con cobertura mínima del 80 % y linter.
+  # Corre al hacer `docker compose up` y termina con código 0 si todo pasa.
+  tests:
+    build: .
+    container_name: cargobox_tests
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "sqlite:///:memory:"
+    command: sh -c "ruff check src tests && pytest"
+
+volumes:
+  pgdata:
