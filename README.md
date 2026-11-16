@@ -28,8 +28,8 @@ cargobox-cln/
 │   ├── domain/              # entidades, value objects, specifications, state machine, eventos
 │   ├── application/         # servicios (casos de uso) y DTOs
 │   ├── infrastructure/      # SQLAlchemy (modelos, repositorios) y adaptadores externos (mocks)
-│   └── api/                 # FastAPI: main, dependencias y routers
-├── tests/                   # unit/ + integration/ + dataset/ (297 pruebas)
+│   └── api/                 # FastAPI: main, dependencias, routers e interfaz web (static/index.html)
+├── tests/                   # unit/ + integration/ + dataset/ (299 pruebas)
 ├── datos/                   # CSV oficiales y CSV resueltos (120 casos + 20 transiciones)
 ├── scripts/                 # cargar_datos.py, ejecutar_casos_alumno.py y demo.py
 ├── .github/workflows/ci.yml # CI/CD (lint, pruebas, dataset y Docker Compose)
