@@ -1,12 +1,11 @@
 """Aplicación FastAPI principal de CargoBox — API REST con documentación OpenAPI/Swagger."""
 
-from pathlib import Path
-from fastapi.responses import FileResponse
-
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 
 from src.api.routers.envios import router as envios_router
 from src.api.routers.operaciones import router as operaciones_router
