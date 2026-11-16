@@ -1,5 +1,8 @@
 """Aplicación FastAPI principal de CargoBox — API REST con documentación OpenAPI/Swagger."""
 
+from pathlib import Path
+from fastapi.responses import FileResponse
+
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -45,3 +48,11 @@ app.include_router(salud_router)
 app.include_router(operaciones_router)
 app.include_router(envios_router)
 app.include_router(reportes_router)
+
+INTERFAZ = Path(__file__).parent / "static" / "index.html"
+
+
+@app.get("/", include_in_schema=False)
+def interfaz_web():
+    """Interfaz web de CargoBox (una sola página HTML que consume esta misma API)."""
+    return FileResponse(INTERFAZ, media_type="text/html")

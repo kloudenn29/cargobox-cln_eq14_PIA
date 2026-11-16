@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CargoBox · Panel de operaciones</title>
+<style>
+:root{--navy:#16284a;--navy2:#22396b;--orange:#e8681a;--orange2:#ffe9db;--bg:#f3f5f9;--card:#fff;--ink:#1b2333;--muted:#667085;--line:#e1e6ef;
+--ok:#1b8a57;--okbg:#e5f6ee;--warn:#b86e00;--warnbg:#fff3dc;--err:#c23030;--errbg:#fde8e8;--info:#2457c5;--infobg:#e6edfd;--radius:12px}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+.topbar{background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 24px;flex-wrap:wrap;position:sticky;top:0;z-index:30}
+.brand{display:flex;align-items:center;gap:12px}
+.brand svg{width:38px;height:38px;flex:none}
+.brand b{display:block;font-size:20px;letter-spacing:.3px;line-height:1.1}
+.brand span{font-size:12.5px;color:#b9c6e4}
+.conn{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:13px}
+.conn label{display:flex;align-items:center;gap:6px;color:#b9c6e4}
+.conn input[type=text]{background:#0f1d3a;border:1px solid #38508a;color:#fff;border-radius:8px;padding:5px 9px;width:230px;font-size:13px}.conn input[type=text]:focus{outline:2px solid #ffb98a}
+.conn a{color:#ffd2b3;text-decoration:none;border:1px solid #6a5a52;border-radius:8px;padding:5px 10px}
+.conn a:hover{background:#2a3d6b}
+.pill{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:4px 12px;font-weight:600;font-size:12.5px}
+.pill::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.pill.on{background:#d9f4e7;color:#0e6b40}.pill.off{background:#fde0e0;color:#a52626}
+.tabs{background:#fff;border-bottom:1px solid var(--line);display:flex;gap:4px;padding:0 24px;overflow-x:auto;position:sticky;top:63px;z-index:20}
+.tab{border:0;background:none;padding:14px 16px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+.tab:hover{color:var(--navy)}
+.tab.active{color:var(--navy);border-bottom-color:var(--orange)}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:22px;max-width:1500px;margin:0 auto;padding:22px 24px 40px;align-items:start}
+@media(max-width:1050px){.layout{grid-template-columns:1fr}.logwrap{position:static!important}}
+@media(max-width:700px){.topbar{position:static}.tabs{top:0;padding:0 8px}.layout{padding:14px 12px 30px}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin-bottom:18px;box-shadow:0 1px 2px rgba(20,35,70,.04)}
+.card h2{margin:0 0 4px;font-size:17px;color:var(--navy)}
+.card h3{margin:0 0 10px;font-size:15px;color:var(--navy)}
+.card .sub{margin:0 0 14px;color:var(--muted);font-size:13.5px}
+.grid{display:grid;gap:12px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:700px){.g2,.g3,.g4{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field>span{font-size:12.5px;font-weight:600;color:#44506a}
+input[type=text],input[type=number],select,textarea{border:1px solid #cfd7e6;border-radius:8px;padding:8px 10px;background:#fff;width:100%;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid #9db7f0;border-color:#6d94ea}
+input:disabled{background:#f0f2f7;color:#98a1b3}
+.row{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap}
+.row .field{flex:1}
+.check{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;cursor:pointer}
+fieldset{border:1px dashed #cfd7e6;border-radius:10px;padding:12px 14px;margin:0}
+legend{font-size:12.5px;font-weight:700;color:var(--orange);padding:0 6px;text-transform:uppercase;letter-spacing:.5px}
+.btn{border:0;border-radius:9px;padding:9px 16px;font-weight:700;cursor:pointer;background:var(--navy);color:#fff}
+.btn:hover{background:var(--navy2)}
+.btn.orange{background:var(--orange)}.btn.orange:hover{background:#cf5710}
+.btn.ghost{background:#fff;color:var(--navy);border:1px solid #c5cfe4}.btn.ghost:hover{background:#eef2fa}
+.btn.small{padding:6px 11px;font-size:13px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{border:1px solid #c5cfe4;background:#fff;border-radius:999px;padding:4px 11px;font-size:12.5px;cursor:pointer;color:var(--navy);font-weight:600}
+.chip:hover{background:var(--infobg)}
+.badge{display:inline-block;border-radius:8px;padding:3px 10px;font-weight:700;font-size:12.5px;letter-spacing:.3px}
+.b-RECIBIDO{background:#e9eef6;color:#41536f}.b-CLASIFICADO{background:#dfeafc;color:#1f4fae}.b-EN_TRANSITO{background:#e6e4fb;color:#4b3fb0}
+.b-DISTRIBUCION_LOCAL{background:#d9f3f1;color:#0d6f69}.b-EN_REPARTO{background:#ffe9d6;color:#b25400}.b-ENTREGADO{background:#d9f4e7;color:#0e6b40}
+.b-CANCELADO{background:#fde0e0;color:#a52626}.b-DEVOLUCION_ORIGEN{background:#f7d2d2;color:#8a1b1b}
+.hint{font-size:12.5px;color:var(--muted);margin:2px 0 10px}
+.rn{display:inline-block;background:var(--orange2);color:#a64a0c;border-radius:6px;padding:1px 7px;font-size:11.5px;font-weight:700;margin-left:6px;vertical-align:middle}
+.res{margin-top:10px;border-radius:9px;padding:9px 12px;font-size:13.5px;display:none;white-space:pre-wrap;word-break:break-word}
+.res.show{display:block}.res.ok{background:var(--okbg);color:#0f5a37;border:1px solid #b9e5cf}
+.res.err{background:var(--errbg);color:#8d2020;border:1px solid #f1bcbc}.res.warn{background:var(--warnbg);color:#7a4a00;border:1px solid #f1d9a4}
+.res b{display:block;margin-bottom:2px}
+.hidden{display:none!important}
+.stepper{display:flex;align-items:center;gap:0;margin:6px 0 4px;overflow-x:auto;padding-bottom:8px}
+.step{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:118px;flex:1;position:relative;text-align:center;font-size:11.5px;font-weight:700;color:#98a1b3}
+.step .dot{width:28px;height:28px;border-radius:50%;background:#e4e9f2;color:#98a1b3;display:flex;align-items:center;justify-content:center;font-size:13px;z-index:1}
+.step::after{content:"";position:absolute;top:13px;left:calc(50% + 16px);right:calc(-50% + 16px);height:3px;background:#e4e9f2}
+.step:last-child::after{display:none}
+.step.done{color:var(--ok)}.step.done .dot{background:var(--ok);color:#fff}.step.done::after{background:var(--ok)}
+.step.now{color:var(--orange)}.step.now .dot{background:var(--orange);color:#fff;box-shadow:0 0 0 5px #ffd9bf}
+.step.bad{color:var(--err)}.step.bad .dot{background:var(--err);color:#fff;box-shadow:0 0 0 5px #f6c5c5}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px 18px;margin-top:10px}
+.fact small{display:block;color:var(--muted);font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.fact div{font-weight:600;word-break:break-word}
+.timeline{list-style:none;margin:12px 0 0;padding:0 0 0 18px;border-left:2px solid var(--line)}
+.timeline li{position:relative;padding:0 0 12px 14px;font-size:13.5px}
+.timeline li::before{content:"";position:absolute;left:-25px;top:4px;width:10px;height:10px;border-radius:50%;background:var(--orange);border:2px solid #fff;box-shadow:0 0 0 1px var(--orange)}
+.timeline time{display:block;color:var(--muted);font-size:12px}
+.actions{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}
+.actions .card{margin:0}
+.kpi{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.donut{--p:0;width:130px;height:130px;border-radius:50%;background:conic-gradient(var(--ok) calc(var(--p)*1%),#e4e9f2 0);display:grid;place-items:center;flex:none}
+.donut div{width:92px;height:92px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:24px;font-weight:800;color:var(--navy)}
+.bars{display:grid;gap:9px;margin-top:6px}
+.bar{display:grid;grid-template-columns:170px 1fr 36px;align-items:center;gap:10px;font-size:13.5px}
+.bar i{display:block;height:14px;border-radius:7px;background:linear-gradient(90deg,var(--orange),#f6a164)}
+.empty{color:var(--muted);font-style:italic;padding:6px 0}
+.alert{border-left:4px solid var(--warn);background:var(--warnbg);border-radius:8px;padding:8px 12px;margin-top:8px;font-size:13.5px}
+.rule{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border-radius:10px;margin-top:10px}
+.rule.ok{background:var(--okbg)}.rule.no{background:var(--errbg)}
+.rule .ico{font-size:22px;line-height:1}
+.rule small{display:block;color:var(--muted);margin-top:3px}
+.logwrap{position:sticky;top:130px}
+.log{max-height:calc(100vh - 230px);overflow:auto;margin:0;padding:0;list-style:none}
+.log li{border:1px solid var(--line);border-radius:9px;margin-bottom:8px;background:#fafbfd;font-size:12.5px}
+.log summary{display:grid;grid-template-columns:auto 1fr;gap:4px 8px;padding:7px 10px;cursor:pointer;list-style:none;align-items:center}
+.log summary::-webkit-details-marker{display:none}
+.st{border-radius:6px;padding:1px 8px;font-weight:800;font-size:12px}
+.st.s2{background:var(--okbg);color:var(--ok)}.st.s4{background:var(--warnbg);color:var(--warn)}.st.s422{background:var(--errbg);color:var(--err)}.st.s5{background:var(--errbg);color:var(--err)}
+.log .path{font-family:ui-monospace,Consolas,monospace;word-break:break-all}
+.log .msg{grid-column:1/-1;color:#4a566e}
+.log pre{margin:0;padding:8px 10px;border-top:1px solid var(--line);background:#111b33;color:#d6e2ff;font-size:11.5px;overflow:auto;max-height:230px;border-radius:0 0 9px 9px}
+.log time{color:var(--muted);font-size:11px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(30px);background:#111b33;color:#fff;border-radius:10px;padding:10px 18px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:80;max-width:90vw}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+footer{text-align:center;color:var(--muted);font-size:12.5px;padding:0 0 26px}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <svg viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="11" fill="#e8681a"/><path d="M24 9 38 16.5v15L24 39 10 31.5v-15z" fill="#fff" opacity=".95"/><path d="M24 9v30M10 16.5l14 7.5 14-7.5" stroke="#e8681a" stroke-width="2.4" fill="none" stroke-linejoin="round"/></svg>
+    <div><b>CargoBox</b><span>Panel de operaciones logísticas · Equipo 14</span></div>
+  </div>
+  <div class="conn">
+    <span id="pill" class="pill off">Sin conexión</span>
+    <label>API <input id="base" type="text" spellcheck="false" title="URL base de la API"></label>
+    <a id="docsLink" href="/docs" target="_blank" rel="noopener">Swagger</a>
+  </div>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button class="tab active" data-tab="nuevo">Nuevo envío</button>
+  <button class="tab" data-tab="seg">Seguimiento y operaciones</button>
+  <button class="tab" data-tab="rep">Reportes</button>
+  <button class="tab" data-tab="reglas">Reglas del dataset</button>
+</nav>
+
+<div class="layout">
+<main>
+
+<!-- ======================= NUEVO ENVÍO ======================= -->
+<section id="tab-nuevo">
+  <div class="card">
+    <h2>Registrar envío en sucursal <span class="rn">US1 · US3 · US8</span></h2>
+    <p class="sub">Genera la guía de rastreo (única), cotiza el flete y asigna el CEDIS por código postal de destino.</p>
+    <form id="formEnvio" class="grid" autocomplete="off">
+      <div class="grid g4">
+        <div class="field"><span>Guía de rastreo</span>
+          <div class="row" style="flex-wrap:nowrap"><input id="f_guia" type="text" required><button type="button" class="btn ghost small" id="btnGuia" title="Generar guía nueva" style="flex:none">Nueva</button></div></div>
+        <div class="field"><span>Remitente (ID)</span><input id="f_rem" type="text" value="CAR-C001" required></div>
+        <div class="field"><span>Peso (kg)</span><input id="f_peso" type="number" step="0.1" min="0.1" value="4.5" required></div>
+        <div class="field"><span>Flete (MXN)</span><input id="f_flete" type="number" step="0.01" min="0" value="350" required></div>
+      </div>
+      <div class="grid g3">
+        <div class="field"><span>Destinatario</span><input id="f_dest" type="text" value="Laura Méndez" required></div>
+        <label class="check" style="align-self:end;padding-bottom:9px"><input id="f_seguro" type="checkbox"> Contratar seguro (1.5 %)</label>
+        <div class="field"><span>Valor declarado (MXN)</span><input id="f_valor" type="number" step="0.01" min="0" value="0" disabled></div>
+      </div>
+      <div class="grid g2">
+        <fieldset><legend>Origen</legend><div class="grid g2">
+          <div class="field"><span>Calle</span><input id="o_calle" type="text" value="Av. Constitución"></div>
+          <div class="field"><span>Número</span><input id="o_num" type="text" value="450"></div>
+          <div class="field"><span>Colonia</span><input id="o_col" type="text" value="Centro"></div>
+          <div class="field"><span>Ciudad</span><input id="o_ciu" type="text" value="Monterrey"></div>
+          <div class="field"><span>Código postal</span><input id="o_cp" type="text" value="64000"></div></div></fieldset>
+        <fieldset><legend>Destino</legend><div class="grid g2">
+          <div class="field"><span>Calle</span><input id="d_calle" type="text" value="Av. Vallarta"></div>
+          <div class="field"><span>Número</span><input id="d_num" type="text" value="1200"></div>
+          <div class="field"><span>Colonia</span><input id="d_col" type="text" value="Americana"></div>
+          <div class="field"><span>Ciudad</span><input id="d_ciu" type="text" value="Guadalajara"></div>
+          <div class="field"><span>Código postal</span><input id="d_cp" type="text" value="44100"></div></div>
+          <div class="chips" id="cpChips"><span class="hint" style="margin:4px 4px 0 0">CP de ejemplo:</span></div></fieldset>
+      </div>
+      <div class="row"><button class="btn orange" type="submit">Registrar envío</button></div>
+    </form>
+    <div id="resNuevo" class="res"></div>
+  </div>
+
+  <div class="card">
+    <h3>Envío de prueba rápido</h3>
+    <p class="sub">Crea un envío nuevo y lo deja en el estado que elijas (avanza paso a paso por la ruta). Ideal para probar reglas en vivo sin repetir clics.</p>
+    <div class="row">
+      <div class="field"><span>Dejarlo en el estado</span>
+        <select id="q_estado"><option>RECIBIDO</option><option>CLASIFICADO</option><option>EN_TRANSITO</option><option>DISTRIBUCION_LOCAL</option><option selected>EN_REPARTO</option></select></div>
+      <label class="check" style="padding-bottom:9px"><input id="q_seguro" type="checkbox"> Con seguro (valor 5,000)</label>
+      <button class="btn" id="btnQuick" type="button">Crear envío de prueba</button>
+    </div>
+    <div id="resQuick" class="res"></div>
+  </div>
+</section>
+
+<!-- ======================= SEGUIMIENTO ======================= -->
+<section id="tab-seg" class="hidden">
+  <div class="card">
+    <h2>Seguimiento de envío <span class="rn">US5</span></h2>
+    <p class="sub">Consulta el estado, el historial y la fecha estimada; desde aquí se ejecutan las reglas de negocio.</p>
+    <form id="formBuscar" class="row">
+      <div class="field"><span>Guía de rastreo</span><input id="s_guia" type="text" placeholder="CBX-1234567" autocomplete="off"></div>
+      <button class="btn" type="submit">Buscar</button>
+    </form>
+    <div class="chips" id="sessionChips"></div>
+    <div id="resBuscar" class="res"></div>
+  </div>
+
+  <div id="envioView" class="hidden">
+    <div class="card">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <h2 style="margin:0"><span id="v_guia"></span> <span id="v_badge" class="badge"></span></h2>
+        <button class="btn ghost small" id="btnRefresh" type="button">Actualizar</button>
+      </div>
+      <div class="stepper" id="stepper"></div>
+      <div class="facts" id="facts"></div>
+      <h3 style="margin-top:16px">Historial de movimientos</h3>
+      <ul class="timeline" id="timeline"></ul>
+    </div>
+
+    <div class="actions">
+      <div class="card" id="act-avanzar">
+        <h3>Avanzar en la ruta <span class="rn">RN-07</span></h3>
+        <p class="hint">Solo se avanza al siguiente estado; no hay saltos ni retrocesos.</p>
+        <button class="btn orange" id="btnNext" type="button">Avanzar</button>
+        <div class="row" style="margin-top:12px"><div class="field"><span>Probar otro destino (debe rechazarse)</span>
+          <select id="a_dest"><option>CLASIFICADO</option><option>EN_TRANSITO</option><option>DISTRIBUCION_LOCAL</option><option selected>EN_REPARTO</option></select></div>
+          <button class="btn ghost small" id="btnForce" type="button">Intentar</button></div>
+        <div class="res"></div>
+      </div>
+
+      <div class="card" id="act-cancelar">
+        <h3>Cancelar envío <span class="rn">RN-01</span></h3>
+        <p class="hint">Solo es posible en sucursal (estado RECIBIDO).</p>
+        <div class="field"><span>Motivo</span><input id="c_motivo" type="text" value="Error en datos del remitente"></div>
+        <button class="btn" id="btnCancel" type="button" style="margin-top:10px">Cancelar envío</button>
+        <div class="res"></div>
+      </div>
+
+      <div class="card" id="act-intento">
+        <h3>Intento de entrega fallido <span class="rn">RN-02</span></h3>
+        <p class="hint">Máximo 2 intentos: el 1.º reprograma, el 2.º devuelve a origen, el 3.º se bloquea. Requiere EN_REPARTO.</p>
+        <div class="field"><span>Motivo</span><input id="i_motivo" type="text" value="Destinatario ausente"></div>
+        <button class="btn" id="btnIntento" type="button" style="margin-top:10px">Registrar intento fallido</button>
+        <div class="res"></div>
+      </div>
+
+      <div class="card" id="act-entregar">
+        <h3>Entregar con evidencia <span class="rn">RN-07 · US13</span></h3>
+        <p class="hint">Solo desde EN_REPARTO y con receptor y evidencia.</p>
+        <div class="grid g2">
+          <div class="field"><span>Receptor</span><input id="e_rec" type="text" value="Laura Méndez"></div>
+          <div class="field"><span>Evidencia (ID)</span><input id="e_evi" type="text" value="FIRMA_DIGITAL_09"></div></div>
+        <button class="btn" id="btnEntregar" type="button" style="margin-top:10px">Marcar como entregado</button>
+        <div class="res"></div>
+      </div>
+
+      <div class="card" id="act-incidencia">
+        <h3>Reportar incidencia <span class="rn">RN-09 · US9 · US11</span></h3>
+        <p class="hint">El daño exige evidencia; la dirección incorrecta solo aplica en EN_REPARTO y regresa el paquete a DISTRIBUCION_LOCAL.</p>
+        <div class="grid g2">
+          <div class="field"><span>Tipo</span><select id="n_tipo"><option>PAQUETE_DANADO</option><option>DIRECCION_INCORRECTA</option><option>EXTRAVIO</option><option>RECHAZO</option></select></div>
+          <div class="field"><span>Evidencia (opcional)</span><input id="n_evi" type="text" placeholder="FOTO_ROTURA_01"></div></div>
+        <div class="field" style="margin-top:8px"><span>Descripción</span><input id="n_desc" type="text" value="Rotura durante maniobras"></div>
+        <button class="btn" id="btnInc" type="button" style="margin-top:10px">Registrar incidencia</button>
+        <div class="res"></div>
+      </div>
+
+      <div class="card" id="act-direccion">
+        <h3>Cambiar dirección de entrega <span class="rn">RN-03 · US7</span></h3>
+        <p class="hint">Solo antes de llegar al CEDIS destino y con rol autorizado (Remitente, Atención a Clientes o Administrador).</p>
+        <div class="grid g2">
+          <div class="field"><span>Rol solicitante</span><select id="r_rol"><option>ATENCION_CLIENTES</option><option>REMITENTE</option><option>ADMINISTRADOR</option><option>REPARTIDOR</option></select></div>
+          <div class="field"><span>Calle</span><input id="r_calle" type="text" value="Av. López Mateos"></div>
+          <div class="field"><span>Número</span><input id="r_num" type="text" value="2375"></div>
+          <div class="field"><span>Colonia</span><input id="r_col" type="text" value="Chapalita"></div>
+          <div class="field"><span>Ciudad</span><input id="r_ciu" type="text" value="Guadalajara"></div>
+          <div class="field"><span>Código postal</span><input id="r_cp" type="text" value="44100"></div></div>
+        <button class="btn" id="btnDir" type="button" style="margin-top:10px">Actualizar dirección</button>
+        <div class="res"></div>
+      </div>
+
+      <div class="card" id="act-indem">
+        <h3>Dictaminar indemnización <span class="rn">RN-04 · US12</span></h3>
+        <p class="hint">Con seguro se paga hasta el valor declarado; sin seguro, el tope es el flete ($350). Solo Analista de Calidad o Administrador.</p>
+        <div class="grid g2">
+          <div class="field"><span>Monto reclamado (MXN)</span><input id="m_monto" type="number" step="0.01" value="3000"></div>
+          <div class="field"><span>Rol que dictamina</span><select id="m_rol"><option>ANALISTA_CALIDAD</option><option>ADMINISTRADOR</option><option>REPARTIDOR</option></select></div></div>
+        <button class="btn" id="btnIndem" type="button" style="margin-top:10px">Dictaminar</button>
+        <div class="res"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= REPORTES ======================= -->
+<section id="tab-rep" class="hidden">
+  <div class="card">
+    <div class="row" style="justify-content:space-between;align-items:center"><h2 style="margin:0">Reportes analíticos</h2><button class="btn ghost small" id="btnRep" type="button">Actualizar</button></div>
+    <p class="sub">Datos tomados directamente de la base de datos.</p>
+  </div>
+  <div class="card"><h3>Entregas a tiempo <span class="rn">US14 · RN-08</span></h3>
+    <div class="kpi"><div class="donut" id="donut"><div id="donutTxt">0%</div></div>
+      <div><div id="kpiTxt" class="empty">Sin datos todavía.</div><div class="hint" id="kpiSla"></div></div></div></div>
+  <div class="card"><h3>Incidencias por tipo <span class="rn">US15</span></h3><div id="incBars" class="bars"><div class="empty">Sin datos todavía.</div></div></div>
+  <div class="card"><h3>Alertas de rastreo detenido <span class="rn">US6 · RN-08</span></h3><p class="hint">Envíos EN_TRANSITO con más de 24 horas sin movimiento.</p><div id="alertas"><div class="empty">Sin datos todavía.</div></div></div>
+</section>
+
+<!-- ======================= REGLAS DEL DATASET ======================= -->
+<section id="tab-reglas" class="hidden">
+  <div class="card">
+    <h2>Operaciones del dataset oficial <span class="rn">RN-05 · RN-06</span></h2>
+    <p class="sub">Specification (reglas combinables con AND / OR / NOT) y State Machine de operaciones sobre los 60 registros cargados.</p>
+    <div class="row"><div class="field"><span>ID de operación</span><input id="p_id" type="text" value="CAR-O001"></div>
+      <button class="btn ghost" id="btnOpGet" type="button">Consultar</button></div>
+    <div class="chips" id="opChips"></div>
+    <div id="opInfo" class="facts"></div>
+  </div>
+  <div class="card"><h3>Reglas con Specification</h3>
+    <div class="row"><button class="btn" id="btnVal" type="button">¿Puede procesarse? (RN-05)</button><button class="btn" id="btnBen" type="button">¿Aplica beneficio VIP? (RN-06)</button></div>
+    <div id="ruleOut"></div></div>
+  <div class="card"><h3>Transición de estado <span class="rn">State Machine</span></h3>
+    <div class="row"><div class="field"><span>Acción</span><select id="p_acc"><option>aprobar</option><option>completar</option><option>cancelar</option><option>repetir_aprobacion</option><option>saltar_estado</option></select></div>
+      <button class="btn orange" id="btnTrans" type="button">Ejecutar transición</button></div>
+    <p class="hint" style="margin-top:8px">Prueba <b>repetir_aprobacion</b> o <b>saltar_estado</b> para ver cómo la máquina rechaza las transiciones inválidas (409).</p>
+    <div id="resTrans" class="res"></div></div>
+</section>
+</main>
+
+<aside class="logwrap">
+  <div class="card">
+    <div class="row" style="justify-content:space-between;align-items:center"><h3 style="margin:0">Registro de peticiones</h3><button class="btn ghost small" id="btnClear" type="button">Limpiar</button></div>
+    <p class="hint">Cada acción hace una llamada real a la API. Toca una fila para ver el JSON.</p>
+    <ul class="log" id="log"><li class="empty" style="border:0;background:none">Aún no hay peticiones.</li></ul>
+  </div>
+</aside>
+</div>
+<footer>CargoBox · Componentes de Lógica de Negocios (CLN) — AD2026 · Equipo 14</footer>
+<div id="toast" class="toast"></div>
+
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const RUTA=["RECIBIDO","CLASIFICADO","EN_TRANSITO","DISTRIBUCION_LOCAL","EN_REPARTO","ENTREGADO"];
+const SIG={RECIBIDO:"CLASIFICADO",CLASIFICADO:"EN_TRANSITO",EN_TRANSITO:"DISTRIBUCION_LOCAL",DISTRIBUCION_LOCAL:"EN_REPARTO"};
+const CPS=[["44100","Guadalajara"],["66450","San Nicolás"],["03100","CDMX"],["99999","Desconocido"]];
+const OPS=["CAR-O001","CAR-O005","CAR-O008","CAR-O002","CAR-O003","CAR-O004"];
+const S={guia:null,sesion:JSON.parse(localStorage.getItem("cb_sesion")||"[]"),logN:0};
+const esc=t=>String(t??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const money=n=>"$"+Number(n).toLocaleString("es-MX",{minimumFractionDigits:2})+" MXN";
+const fdate=i=>{try{return new Date(i).toLocaleString("es-MX",{dateStyle:"medium",timeStyle:"short"})}catch(e){return i}};
+
+/* ---------- base URL ---------- */
+const RENDER="https://cargobox-api-u98o.onrender.com";
+const defBase=location.protocol.startsWith("http")?"":RENDER;
+let base=localStorage.getItem("cb_base")||defBase;
+$("#base").value=base||location.origin;
+$("#base").addEventListener("change",e=>{let v=e.target.value.trim().replace(/\/$/,"");base=(v===location.origin&&location.protocol.startsWith("http"))?"":v;localStorage.setItem("cb_base",base);$("#docsLink").href=(base||"")+"/docs";health();});
+$("#docsLink").href=(base||"")+"/docs";
+
+/* ---------- toast / resultados ---------- */
+let tt;function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("show"),2600);}
+function show(el,kind,title,msg){el.className="res show "+kind;el.innerHTML=(title?"<b>"+esc(title)+"</b>":"")+esc(msg||"");}
+function hide(el){el.className="res";el.innerHTML="";}
+function errMsg(d,status){if(d&&Array.isArray(d.detail))return d.detail.map(x=>(x.loc||[]).slice(1).join(".")+": "+x.msg).join("\n");if(d&&d.detail)return d.detail;return "Error HTTP "+status;}
+
+/* ---------- API ---------- */
+async function api(method,path,body){
+  const t0=performance.now();let res,data=null,status=0,net=false;
+  try{res=await fetch(base+path,{method,headers:body?{"Content-Type":"application/json"}:undefined,body:body?JSON.stringify(body):undefined});status=res.status;
+      const tx=await res.text();try{data=tx?JSON.parse(tx):null}catch(e){data={detail:tx.slice(0,200)}}}
+  catch(e){net=true;data={detail:"No se pudo conectar con la API ("+(base||location.origin)+"). ¿Está levantado el servidor? Si es Render gratis, espera ~1 minuto y reintenta."};}
+  const ms=Math.round(performance.now()-t0);
+  log(method,path,status,data,body,ms,net);
+  return {ok:!net&&status>=200&&status<300,status,data,msg:net?data.detail:errMsg(data,status)};
+}
+function log(method,path,status,data,body,ms,net){
+  const ul=$("#log");if(ul.firstElementChild&&ul.firstElementChild.classList.contains("empty"))ul.innerHTML="";
+  const cls=net?"s5":status>=500?"s5":status===422?"s422":status>=400?"s4":"s2";
+  const msg=net?data.detail:(status>=400?errMsg(data,status):(data&&(data.estado||data.mensaje||(data.cumple!==undefined?(data.cumple?"CUMPLE":"NO CUMPLE"):"")))||"");
+  const li=document.createElement("li");
+  li.innerHTML=`<details><summary><span class="st ${cls}">${net?"ERR":status}</span><span><span class="path">${esc(method)} ${esc(path)}</span> <time>${new Date().toLocaleTimeString("es-MX")} · ${ms} ms</time></span><span class="msg">${esc(msg)}</span></summary><pre>${esc((body?"// petición\n"+JSON.stringify(body,null,2)+"\n\n":"")+"// respuesta\n"+JSON.stringify(data,null,2))}</pre></details>`;
+  ul.prepend(li);while(ul.children.length>60)ul.lastChild.remove();
+}
+$("#btnClear").onclick=()=>{$("#log").innerHTML='<li class="empty" style="border:0;background:none">Aún no hay peticiones.</li>';};
+
+let fallos=0;
+async function health(){const r=await fetch(base+"/health").then(x=>x.json()).catch(()=>null);const p=$("#pill");
+  if(r&&r.status==="UP"){fallos=0;p.className="pill on";p.textContent="API conectada · BD "+r.database;}
+  else{fallos++;p.className="pill off";const remoto=/onrender\.com/.test(base||location.origin);
+    p.textContent=r?"API degradada":(remoto&&fallos<=12?"Despertando servidor… (Render tarda hasta 1 min)":"Sin conexión");
+    if(!r&&remoto&&fallos<=12)setTimeout(health,5000);}}
+
+/* ---------- pestañas ---------- */
+let opsListo=false;
+function tab(n){$$(".tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===n));["nuevo","seg","rep","reglas"].forEach(x=>$("#tab-"+x).classList.toggle("hidden",x!==n));if(n==="rep")loadReportes();if(n==="reglas"&&!opsListo){opsListo=true;opGet();}}
+$$(".tab").forEach(b=>b.onclick=()=>tab(b.dataset.tab));
+
+/* ---------- nuevo envío ---------- */
+function nuevaGuia(){return "CBX-"+String(Date.now()).slice(-7);}
+$("#f_guia").value=nuevaGuia();$("#btnGuia").onclick=()=>{$("#f_guia").value=nuevaGuia();};
+$("#f_seguro").onchange=e=>{$("#f_valor").disabled=!e.target.checked;if(e.target.checked&&!+$("#f_valor").value)$("#f_valor").value=5000;if(!e.target.checked)$("#f_valor").value=0;};
+CPS.forEach(([cp,n])=>{const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=cp+" · "+n;b.onclick=()=>{$("#d_cp").value=cp;if(n!=="Desconocido")$("#d_ciu").value=n==="CDMX"?"Ciudad de México":n;};$("#cpChips").appendChild(b);});
+const dir=p=>({calle:$("#"+p+"_calle").value,numero:$("#"+p+"_num").value,colonia:$("#"+p+"_col").value,ciudad:$("#"+p+"_ciu").value,codigo_postal:$("#"+p+"_cp").value});
+function cuerpoEnvio(g){return {guia:g||$("#f_guia").value.trim(),remitente_id:$("#f_rem").value.trim(),destinatario_nombre:$("#f_dest").value.trim(),direccion_origen:dir("o"),direccion_destino:dir("d"),peso_kg:+$("#f_peso").value,seguro_amparado:$("#f_seguro").checked,valor_declarado:+$("#f_valor").value||0,flete_monto:+$("#f_flete").value};}
+function recordar(g){if(!S.sesion.includes(g)){S.sesion.unshift(g);S.sesion=S.sesion.slice(0,12);localStorage.setItem("cb_sesion",JSON.stringify(S.sesion));}chips();}
+function chips(){const c=$("#sessionChips");c.innerHTML=S.sesion.length?'<span class="hint" style="margin:4px 4px 0 0">Envíos recientes:</span>':"";S.sesion.forEach(g=>{const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=g;b.onclick=()=>{$("#s_guia").value=g;abrir(g);};c.appendChild(b);});}
+$("#formEnvio").onsubmit=async e=>{e.preventDefault();const r=await api("POST","/envios/",cuerpoEnvio());const o=$("#resNuevo");
+  if(r.ok){recordar(r.data.guia);show(o,"ok","Envío registrado · "+r.data.guia,`Estado: ${r.data.estado}\nCEDIS asignado: ${r.data.cedis_actual}\nFlete: ${money(r.data.flete_mxn)}${r.data.seguro_amparado?" · Seguro sobre "+money(r.data.valor_declarado_mxn):""}`);
+    o.insertAdjacentHTML("beforeend",`<div style="margin-top:8px"><button class="btn small" type="button" id="goSeg">Ver seguimiento</button></div>`);$("#goSeg").onclick=()=>{$("#s_guia").value=r.data.guia;abrir(r.data.guia);};$("#f_guia").value=nuevaGuia();}
+  else show(o,r.status===409?"warn":"err",r.status===409?"Regla de negocio (409)":"Error "+r.status,r.msg);};
+$("#btnQuick").onclick=async()=>{const o=$("#resQuick"),dest=$("#q_estado").value,g=nuevaGuia();const seg=$("#q_seguro").checked;
+  const b={...cuerpoEnvio(g),seguro_amparado:seg,valor_declarado:seg?5000:0};const r=await api("POST","/envios/",b);if(!r.ok){show(o,"err","No se pudo crear",r.msg);return;}
+  let e=r.data.estado;while(e!==dest&&SIG[e]){const a=await api("POST",`/envios/${g}/avanzar`,{destino:SIG[e]});if(!a.ok){show(o,"err","Se detuvo en "+e,a.msg);return;}e=a.data.estado;}
+  recordar(g);show(o,"ok","Listo · "+g,"Envío creado y dejado en "+e+". Abriendo seguimiento…");toast("Envío "+g+" en "+e);setTimeout(()=>{$("#s_guia").value=g;abrir(g);},500);};
+
+/* ---------- seguimiento ---------- */
+async function abrir(g){tab("seg");$("#s_guia").value=g;await cargar(g,true);}
+$("#formBuscar").onsubmit=e=>{e.preventDefault();const g=$("#s_guia").value.trim();if(g)cargar(g,true);};
+$("#btnRefresh").onclick=()=>cargar(S.guia);
+async function cargar(g,limpiar){const o=$("#resBuscar");const [a,b]=await Promise.all([api("GET","/envios/"+encodeURIComponent(g)),api("GET",`/envios/${encodeURIComponent(g)}/rastreo`)]);
+  if(!a.ok||!b.ok){$("#envioView").classList.add("hidden");show(o,"err",a.status===404?"Envío no encontrado":"Error "+a.status,a.msg);return;}
+  hide(o);S.guia=g;recordar(g);$("#envioView").classList.remove("hidden");if(limpiar)$$("#envioView .actions .res").forEach(hide);pintar(a.data,b.data);}
+function pintar(e,r){
+  $("#v_guia").textContent=e.guia;const bd=$("#v_badge");bd.textContent=e.estado;bd.className="badge b-"+e.estado;
+  const visitados=new Set(r.historial.map(h=>h.estado));const idx=RUTA.indexOf(e.estado);
+  $("#stepper").innerHTML=RUTA.map((s,i)=>{let c="";if(e.estado==="CANCELADO"||e.estado==="DEVOLUCION_ORIGEN"){c=visitados.has(s)?"done":"";}else c=(i<idx||e.estado==="ENTREGADO")?"done":i===idx?"now":"";return `<div class="step ${c}"><div class="dot">${c==="done"?"✓":i+1}</div>${s.replace("_"," ")}</div>`;}).join("")
+    +((e.estado==="CANCELADO"||e.estado==="DEVOLUCION_ORIGEN")?`<div class="step bad"><div class="dot">✕</div>${e.estado.replace("_"," ")}</div>`:"");
+  $("#facts").innerHTML=[["CEDIS actual",e.cedis_actual],["Intentos de entrega",e.intentos_entrega+" de 2"],["Entrega estimada (SLA 72 h)",fdate(r.fecha_estimada_entrega)],["Destinatario",e.destinatario_nombre],["Flete",money(e.flete_mxn)],["Seguro",e.seguro_amparado?"Sí · valor "+money(e.valor_declarado_mxn):"No"],["Origen",e.origen_resumen],["Destino",e.destino_resumen]].map(([k,v])=>`<div class="fact"><small>${esc(k)}</small><div>${esc(v)}</div></div>`).join("");
+  $("#timeline").innerHTML=r.historial.slice().reverse().map(h=>`<li><b>${esc(h.estado)}</b> — ${esc(h.detalle)}<time>${esc(fdate(h.fecha))}</time></li>`).join("");
+  const n=SIG[e.estado],bt=$("#btnNext");bt.disabled=!n;bt.textContent=n?"Avanzar a "+n:"Sin siguiente estado en la ruta";
+}
+function card(id){return $("#"+id+" .res");}
+async function accion(card_id,method,path,body,titulo){$$("#envioView .actions .res").forEach(hide);const r=await api(method,path,body);const o=card(card_id);
+  if(r.ok){show(o,"ok",titulo||"Aceptado ("+r.status+")",r.data&&(r.data.mensaje||(r.data.estado?"Nuevo estado: "+r.data.estado:"")));await cargar(S.guia);const o2=card(card_id);show(o2,"ok",titulo||"Aceptado ("+r.status+")",r.data&&(r.data.mensaje||(r.data.estado?"Nuevo estado: "+r.data.estado:"")));return r;}
+  show(o,r.status===409||r.status===422?"warn":"err",r.status===409?"Rechazado por regla de negocio (409)":r.status===422?"Datos no válidos (422)":"Error "+r.status,r.msg);return r;}
+const G=()=>encodeURIComponent(S.guia);
+$("#btnNext").onclick=()=>{const cur=$("#v_badge").textContent;if(SIG[cur])accion("act-avanzar","POST",`/envios/${G()}/avanzar`,{destino:SIG[cur]},"Avance aceptado");};
+$("#btnForce").onclick=()=>accion("act-avanzar","POST",`/envios/${G()}/avanzar`,{destino:$("#a_dest").value},"Avance aceptado");
+$("#btnCancel").onclick=()=>accion("act-cancelar","POST",`/envios/${G()}/cancelar`,{motivo:$("#c_motivo").value},"Envío cancelado");
+$("#btnIntento").onclick=()=>accion("act-intento","POST",`/envios/${G()}/intento-fallido`,{motivo:$("#i_motivo").value},"Intento registrado");
+$("#btnEntregar").onclick=()=>accion("act-entregar","POST",`/envios/${G()}/entregar`,{receptor:$("#e_rec").value,evidencia_id:$("#e_evi").value},"Entrega registrada");
+$("#btnInc").onclick=()=>accion("act-incidencia","POST",`/envios/${G()}/incidencias`,{tipo:$("#n_tipo").value,descripcion:$("#n_desc").value,evidencia_id:$("#n_evi").value},"Incidencia registrada");
+$("#btnDir").onclick=()=>accion("act-direccion","POST",`/envios/${G()}/direccion`,{rol_solicitante:$("#r_rol").value,nueva_direccion:{calle:$("#r_calle").value,numero:$("#r_num").value,colonia:$("#r_col").value,ciudad:$("#r_ciu").value,codigo_postal:$("#r_cp").value}},"Dirección actualizada");
+$("#btnIndem").onclick=async()=>{$$("#envioView .actions .res").forEach(hide);const r=await api("POST",`/envios/${G()}/indemnizacion`,{monto_reclamado:+$("#m_monto").value,rol_dictaminador:$("#m_rol").value});const o=card("act-indem");
+  if(r.ok)show(o,"ok","Autorizado: "+money(r.data.monto_autorizado)+(r.data.tiene_seguro?" (con seguro)":" (tope = flete)"),r.data.mensaje);else show(o,r.status===409||r.status===422?"warn":"err",r.status===422?"No permitido (422)":"Error "+r.status,r.msg);};
+
+/* ---------- reportes ---------- */
+async function loadReportes(){const [t,i,a]=await Promise.all([api("GET","/reportes/entregas-a-tiempo"),api("GET","/reportes/incidencias"),api("GET","/envios/alertas/rastreo-detenido")]);
+  if(t.ok){const d=t.data;$("#donut").style.setProperty("--p",d.porcentaje_a_tiempo);$("#donutTxt").textContent=d.porcentaje_a_tiempo+"%";
+    $("#kpiTxt").className="";$("#kpiTxt").innerHTML=d.total_entregados?`<b style="font-size:18px">${d.entregados_a_tiempo} de ${d.total_entregados}</b> envíos entregados dentro de la promesa de servicio`:"Todavía no hay envíos entregados.";$("#kpiSla").textContent="Promesa de servicio (SLA): "+d.sla_horas+" horas desde el registro.";}
+  if(i.ok){const e=Object.entries(i.data.por_tipo);const max=Math.max(1,...e.map(x=>x[1]));$("#incBars").innerHTML=e.length?e.map(([k,v])=>`<div class="bar"><span>${esc(k)}</span><i style="width:${Math.max(6,v/max*100)}%"></i><b>${v}</b></div>`).join("")+`<div class="hint">Total: ${i.data.total_incidencias} incidencias</div>`:'<div class="empty">Aún no hay incidencias registradas.</div>';}
+  if(a.ok)$("#alertas").innerHTML=a.data.length?a.data.map(x=>`<div class="alert"><b>${esc(x.guia)}</b> · ${esc(x.estado)} · ${x.horas_sin_movimiento} h sin movimiento → notificado a ${esc(x.notificado_a)}</div>`).join(""):'<div class="empty">Sin alertas: ningún envío lleva más de 24 h detenido.</div>';}
+$("#btnRep").onclick=loadReportes;
+
+/* ---------- reglas del dataset ---------- */
+OPS.forEach(o=>{const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=o;b.onclick=()=>{$("#p_id").value=o;opGet();};$("#opChips").appendChild(b);});
+const OID=()=>encodeURIComponent($("#p_id").value.trim());
+async function opGet(){const r=await api("GET","/operaciones/"+OID());const o=$("#opInfo");if(!r.ok){o.innerHTML=`<div class="res show err" style="grid-column:1/-1">${esc(r.msg)}</div>`;return;}
+  const d=r.data;o.innerHTML=[["Operación",d.operacion_id],["Cliente",d.actor_id],["Estado",d.estado],["Total",money(d.total_mxn)],["Líneas de detalle",d.detalles_count],["Autorizada",d.autorizado?"Sí":"No"],["Promoción activa",d.promocion_activa?"Sí":"No"],["Fecha",d.fecha_solicitud]].map(([k,v])=>`<div class="fact"><small>${esc(k)}</small><div>${esc(v)}</div></div>`).join("");}
+$("#btnOpGet").onclick=opGet;
+async function regla(ruta){const r=await api("GET",`/operaciones/${OID()}/${ruta}`);const o=$("#ruleOut");if(!r.ok){o.innerHTML=`<div class="res show err">${esc(r.msg)}</div>`;return;}
+  o.innerHTML=`<div class="rule ${r.data.cumple?"ok":"no"}"><div class="ico">${r.data.cumple?"✅":"❌"}</div><div><b>${r.data.cumple?"CUMPLE":"NO CUMPLE"}</b> — ${esc(r.data.regla)}<small>${esc(r.data.explicacion)}</small></div></div>`;opGet();}
+$("#btnVal").onclick=()=>regla("validar");$("#btnBen").onclick=()=>regla("beneficio");
+$("#btnTrans").onclick=async()=>{const r=await api("POST",`/operaciones/${OID()}/transicion`,{accion:$("#p_acc").value});const o=$("#resTrans");
+  if(r.ok){show(o,"ok","Transición ejecutada",`${r.data.estado_anterior} → ${r.data.estado_nuevo}\n${r.data.mensaje}`);opGet();}else show(o,r.status===409?"warn":"err",r.status===409?"Rechazada por la State Machine (409)":"Error "+r.status,r.msg);};
+
+chips();health();setInterval(health,20000);
+window.CargoBox={api,abrir,tab};
+})();
+</script>
+</body>
+</html>
