@@ -13,6 +13,7 @@
 |---|---|
 | **Repositorio GitHub** | https://github.com/kloudenn29/cargobox-cln_eq14_PIA |
 | **Sistema desplegado (Swagger UI)** | https://cargobox-api-u98o.onrender.com/docs |
+| **Interfaz web desplegada** | https://cargobox-api-u98o.onrender.com/ |
 
 ---
 ## 1. Estructura del repositorio
